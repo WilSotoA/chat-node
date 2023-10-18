@@ -4,14 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatNode</title>
+    <script type="module">
+        import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
+        const socket = io()
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            if (input.value) {
+                socket.emit('chat message', input.value)
+                input.value = ''
+            }
+        })
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="font-sans bg-slate-500">
-    <h1>Chat Node</h1>
-    <section id="chat">
-        <form action="">
-            <input type="text" name="message" id="input" placeholder="Escribe un mensaje" autocomplete="off">
-            <button type="submit">Enviar</button>
+<body class="font-sans bg-slate-800">
+    <h1 class="text-2xl my-2 text-center text-white">Chat Node</h1>
+    <section class="relative w-[80%] mx-auto min-h-[80vh] border-2 border-white" id="chat">
+        <form id="form" class="w-full flex flex-wrap gap-2 absolute bottom-0">
+            <input class="focus:outline-none flex-1 p-2 m-2 rounded-2xl border border-solid border-gray-50 bg-slate-900 text-white" type="text" name="message" id="input" placeholder="Escribe un mensaje" autocomplete="off">
+            <button class="bg-blue-800 border-0 my-2 mr-2 rounded-lg p-2 text-white hover:bg-blue-500" type="submit">Enviar</button>
         </form>
     </section>
 </body>

@@ -1,34 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ChatNode</title>
     <script type="module">
-        import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
-        const socket = io()
+      import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+      const socket = io({
+        auth: {
+            serverOffSet: 0
+        }
+      });
 
-        const form = document.getElementById('form')
-        const input = document.getElementById('input')
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
+      socket.on("chat message", (msg, serverOffSet) => {
+        const item = `<li class="p-2 odd:bg-slate-200 text-black">${msg}</li>`;
+        messages.insertAdjacentHTML("beforeend", item);
+        socket.auth.serverOffSet = serverOffSet
+      });
 
-            if (input.value) {
-                socket.emit('chat message', input.value)
-                input.value = ''
-            }
-        })
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        if (input.value) {
+          socket.emit("chat message", input.value);
+          input.value = "";
+        }
+      });
     </script>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body class="font-sans bg-slate-800">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="text-white font-sans bg-slate-800">
     <h1 class="text-2xl my-2 text-center text-white">Chat Node</h1>
-    <section class="relative w-[80%] mx-auto min-h-[80vh] border-2 border-white" id="chat">
-        <form id="form" class="w-full flex flex-wrap gap-2 absolute bottom-0">
-            <input class="focus:outline-none flex-1 p-2 m-2 rounded-2xl border border-solid border-gray-50 bg-slate-900 text-white" type="text" name="message" id="input" placeholder="Escribe un mensaje" autocomplete="off">
-            <button class="bg-blue-800 border-0 my-2 mr-2 rounded-lg p-2 text-white hover:bg-blue-500" type="submit">Enviar</button>
-        </form>
+    <section
+      class="relative w-[80%] mx-auto min-h-[80vh] border-2 border-white"
+      id="chat"
+    >
+      <ul class="overflow-y-auto max-h-[70vh] flex flex-col gap-2 list-none m-0 p-0" id="messages">
+        <!-- <li class="p-2 odd:bg-slate-200"></li> -->
+      </ul>
+      <form id="form" class="w-full flex flex-wrap gap-2 absolute bottom-0">
+        <input
+          class="focus:outline-none flex-1 p-2 m-2 rounded-2xl border border-solid border-gray-50 bg-slate-900 text-white"
+          type="text"
+          name="message"
+          id="input"
+          placeholder="Escribe un mensaje"
+          autocomplete="off"
+        />
+        <button
+          class="bg-blue-800 border-0 my-2 mr-2 rounded-lg p-2 text-white hover:bg-blue-500"
+          type="submit"
+        >
+          Enviar
+        </button>
+      </form>
     </section>
-</body>
+  </body>
 </html>

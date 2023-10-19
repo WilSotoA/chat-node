@@ -20,7 +20,8 @@ try {
   await client.query(`
     CREATE TABLE IF NOT EXISTS messages (
         id SERIAL PRIMARY KEY,
-        content TEXT
+        content TEXT,
+        username TEXT
     )`)
 } catch (e) {
   console.error(e)
@@ -35,16 +36,17 @@ io.on('connection', async (socket) => {
 
   socket.on('chat message', async (msg) => {
     let result
+    const username = socket.handshake.auth.username ?? 'anonymous'
     try {
       result = await client.query(
-        'INSERT INTO messages (content) VALUES ($1) RETURNING id',
-        [msg]
+        'INSERT INTO messages (content, username) VALUES ($1, $2) RETURNING id',
+        [msg, username]
       )
     } catch (e) {
       console.error(e)
       return
     }
-    io.emit('chat message', msg, result.rows[0].id)
+    io.emit('chat message', msg, result.rows[0].id, username)
   })
   if (!socket.recovered) {
     try {
@@ -54,7 +56,7 @@ io.on('connection', async (socket) => {
       )
 
       results.rows.forEach(row => {
-        socket.emit('chat message', row.content, row.id)
+        socket.emit('chat message', row.content, row.id, row.username)
       })
     } catch (e) {
       console.error(e)
